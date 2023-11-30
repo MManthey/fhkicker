@@ -13,12 +13,6 @@ emailForSignIn.subscribe((newValue) => {
 isAuthenticated.subscribe((newValue) => {
 	if (browser) {
 		console.log(`isAuthenticated: ${newValue}`);
-		if (newValue) {
-			// If authenticated, redirect to the dashboard
-			goto('/dashboard');
-		} else {
-			// If not authenticated, redirect to the login page
-			goto('/');
-		}
+		goto(newValue ? '/games' : '/');
 	}
 });

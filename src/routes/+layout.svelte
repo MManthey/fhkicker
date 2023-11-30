@@ -21,8 +21,10 @@
 				<strong class="text-xl uppercase">FHKicker</strong>
 			</svelte:fragment>
 			<svelte:fragment slot="trail">
-				{#if isAuthenticated}
-					<button on:click={logout} class="btn btn-sm variant-ghost-surface"> Logout </button>
+				{#if $isAuthenticated}
+					<a href="/games" class="btn btn-sm variant-ghost-surface">Spiele</a>
+					<a href=/rankings class="btn btn-sm variant-ghost-surface">Rangliste</a>
+					<button on:click={logout} class="btn btn-sm variant-ghost-surface">Abmelden</button>
 				{/if}
 			</svelte:fragment>
 		</AppBar>
