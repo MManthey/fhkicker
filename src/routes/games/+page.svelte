@@ -6,7 +6,7 @@
 	let games: Game[] = [
 		{
 			teamA: ['Marten', 'Linda'],
-			teamB: ['Klaus', 'Peter']
+			teamB: ['Klaus']
 		}
 	];
 
@@ -18,20 +18,26 @@
 	<div class="text-4xl m-5">Spiele</div>
 	{#each games as game, i}
 		<div
-			class="card {i === 0
+			class="card grid grid-cols-3 p-5 {i === 0
 				? 'variant-ghost-success'
-				: 'variant-ghost-warning'} flex flex-row gap-10 p-5"
+				: 'variant-ghost-warning'}"
 		>
-			<div class="flex flex-col items-center gap-2">
+			<div class="grid grid-rows-2 gap-2">
 				{#each game.teamA as player}
-					<div>{player}</div>
+					<div class="flex justify-center items-center">{player}</div>
 				{/each}
+				{#if game.teamA.length !== 2}
+					<button class="btn variant-filled-success">Join</button>
+				{/if}
 			</div>
 			<div class="flex justify-center items-center">VS.</div>
-			<div class="flex flex-col items-center gap-2">
+			<div class="grid grid-rows-2 gap-2">
 				{#each game.teamB as player}
-					<div>{player}</div>
+					<div class="flex justify-center items-center">{player}</div>
 				{/each}
+				{#if game.teamB.length !== 2}
+					<button class="btn variant-filled-success">Join</button>
+				{/if}
 			</div>
 		</div>
 	{/each}

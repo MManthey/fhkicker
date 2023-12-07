@@ -7,7 +7,7 @@
 	import { storePopup } from '@skeletonlabs/skeleton';
 
 	import { isAuthenticated } from '$lib/stores';
-	import { logout } from '$lib/firebase';
+	import { logout, checkIfEmailUsed } from '$lib/firebase';
 
 	storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
 </script>

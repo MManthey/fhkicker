@@ -1,22 +1,47 @@
 <script>
 	import { onMount } from 'svelte';
+	import { fade } from 'svelte/transition';
 	import { sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } from 'firebase/auth';
+	import { ProgressRadial } from '@skeletonlabs/skeleton';
 
-	import { auth } from '$lib/firebase';
+	import { auth, checkIfEmailUsed, createUser } from '$lib/firebase';
 	import { emailForSignIn } from '$lib/stores';
-
-	let email = '';
 
 	const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 	const fhEmailRegex = /@fh-wedel\.de$/;
 
+	let disabledEmailInput = false;
+	let email = '';
+	let emailIsUsed = false;
+
+	let userName = '';
+
+	let buttonLoading = false;
+
 	$: isEmail = emailRegex.test(email);
 	$: isFhEmail = fhEmailRegex.test(email);
 
-	$: console.log(`email: ${email}, isEmail: ${isEmail}, isFhEmail: ${isFhEmail}`);
+	$: showUsernameInput = isFhEmail && !emailIsUsed;
+	$: showButton = emailIsUsed ? isFhEmail : isFhEmail && userName;
+
+	$: if (isFhEmail) {
+		checkEmailUsage();
+	}
+
+	async function checkEmailUsage() {
+		try {
+			disabledEmailInput = true;
+			emailIsUsed = await checkIfEmailUsed(email);
+		} catch (error) {
+			console.error('Error checking email:', error);
+		} finally {
+			disabledEmailInput = false;
+		}
+	}
 
 	async function sendLink() {
 		try {
+			buttonLoading = true;
 			const actionCodeSettings = {
 				// URL you want to redirect back to
 				url: 'http://localhost:5173',
@@ -25,11 +50,14 @@
 
 			await sendSignInLinkToEmail(auth, email, actionCodeSettings);
 			// Save the email locally to complete the sign-in process later
-
 			$emailForSignIn = email;
+
+			if (!emailIsUsed) await createUser(email, userName);
 		} catch (error) {
 			console.error('Logout failed:', error);
 			// Handle errors
+		} finally {
+			buttonLoading = false;
 		}
 	}
 
@@ -50,13 +78,41 @@
 	});
 </script>
 
-<div class="max-w-xs m-auto w-full h-full flex flex-col justify-center items-center gap-5">
-	<input
-		class="input {isEmail ? (isFhEmail ? 'input-success' : 'input-error') : ''}"
-		title="Email"
-		type="email"
-		placeholder="FH-Wedel Mail angeben"
-		bind:value={email}
-	/>
-	<button on:click={sendLink} class="btn variant-filled w-full">Anmeldelink senden</button>
+<div class="max-w-xs m-auto h-full flex justify-center items-center">
+	<div class="w-full grid grid-rows-3 gap-5">
+		<input
+			class="input {isEmail ? (isFhEmail ? 'input-success' : 'input-error') : ''}"
+			title="Email"
+			type="email"
+			placeholder="FH-Wedel Mail angeben"
+			bind:value={email}
+			disabled={disabledEmailInput}
+		/>
+		{#if showUsernameInput}
+			<input
+				class="input"
+				title="Username"
+				type="text"
+				placeholder="Spielername"
+				transition:fade={{ duration: 200 }}
+				bind:value={userName}
+			/>
+		{/if}
+		{#if showButton}
+			<button
+				class="btn variant-filled w-full"
+				transition:fade={{ duration: 200 }}
+				on:click={sendLink}
+				disabled={buttonLoading}
+			>
+				{#if buttonLoading}
+					<ProgressRadial width="w-6"/>
+				{:else if emailIsUsed}
+					Anmelden
+				{:else}
+					Registrieren
+				{/if}
+			</button>
+		{/if}
+	</div>
 </div>

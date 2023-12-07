@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app';
-import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
+import { getAuth, onAuthStateChanged, signOut, fetchSignInMethodsForEmail } from 'firebase/auth';
 
 import { isAuthenticated } from '$lib/stores';
 
@@ -40,4 +40,20 @@ export async function logout() {
 		console.error('Logout failed:', error);
 		// Optionally handle errors (e.g., display an error message)
 	}
+}
+
+export async function checkIfEmailUsed(email: string) {
+	try {
+		const signInMethods = await fetchSignInMethodsForEmail(auth, email);
+		return signInMethods.length > 0;
+	} catch (error) {
+		console.error('Error checking email:', error);
+		// Handle other errors, possibly set an error message
+		return false;
+	}
+}
+
+export async function createUser(email: string, userName: string) {
+	email
+	userName
 }
