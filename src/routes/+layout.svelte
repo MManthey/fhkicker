@@ -7,7 +7,7 @@
 	import { storePopup } from '@skeletonlabs/skeleton';
 
 	import { isAuthenticated } from '$lib/stores';
-	import { logout, checkIfEmailUsed } from '$lib/firebase';
+	import { logOut } from '$lib/firebase';
 
 	storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
 </script>
@@ -24,7 +24,7 @@
 				{#if $isAuthenticated}
 					<a href="/games" class="btn btn-sm variant-ghost-surface">Spiele</a>
 					<a href=/rankings class="btn btn-sm variant-ghost-surface">Rangliste</a>
-					<button on:click={logout} class="btn btn-sm variant-ghost-surface">Abmelden</button>
+					<button on:click={logOut} class="btn btn-sm variant-ghost-surface">Abmelden</button>
 				{/if}
 			</svelte:fragment>
 		</AppBar>

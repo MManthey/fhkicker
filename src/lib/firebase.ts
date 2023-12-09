@@ -1,6 +1,15 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app';
-import { getAuth, onAuthStateChanged, signOut, fetchSignInMethodsForEmail } from 'firebase/auth';
+import {
+	getAuth,
+	onAuthStateChanged,
+	signOut,
+	fetchSignInMethodsForEmail,
+	signInWithEmailAndPassword,
+	createUserWithEmailAndPassword
+} from 'firebase/auth';
+import { getFirestore, doc, setDoc, query, collection, where, getDocs } from 'firebase/firestore';
+
 
 import { isAuthenticated } from '$lib/stores';
 
@@ -20,6 +29,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
 export { auth };
 
@@ -31,29 +41,44 @@ onAuthStateChanged(auth, (user) => {
 	}
 });
 
-export async function logout() {
+export async function signIn(email: string, password: string) {
+	try {
+		await signInWithEmailAndPassword(auth, email, password);
+	} catch (error) {
+		console.error('Authentication failed:', error);
+		// Handle errors
+	}
+}
+
+export async function register(email: string, password: string, playerName: string) {
+	try {
+		let userCredential = await createUserWithEmailAndPassword(auth, email, password);
+		await createUserRecord(userCredential.user.uid, email, playerName);
+	} catch (error) {
+		console.error('Authentication failed:', error);
+		// Handle errors
+	}
+}
+
+export async function logOut() {
 	try {
 		await signOut(auth);
-		// Handle any post-logout logic here (e.g., redirecting to the home page)
 		isAuthenticated.set(false);
 	} catch (error) {
-		console.error('Logout failed:', error);
-		// Optionally handle errors (e.g., display an error message)
+		console.error('logOut failed:', error);
+		// Handle errors
 	}
 }
 
-export async function checkIfEmailUsed(email: string) {
+export async function createUserRecord(uid: string, email: string, playerName: string) {
 	try {
-		const signInMethods = await fetchSignInMethodsForEmail(auth, email);
-		return signInMethods.length > 0;
+		await setDoc(doc(db, "users", uid), {
+			email: email,
+			playerName: playerName
+		});
 	} catch (error) {
-		console.error('Error checking email:', error);
-		// Handle other errors, possibly set an error message
-		return false;
-	}
-}
+		console.error("Error creating user record:", error);
+		// Handle errors
 
-export async function createUser(email: string, userName: string) {
-	email
-	userName
+	}
 }
