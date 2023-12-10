@@ -8,10 +8,10 @@ import {
 	signInWithEmailAndPassword,
 	createUserWithEmailAndPassword
 } from 'firebase/auth';
-import { getFirestore, doc, setDoc, query, collection, where, getDocs } from 'firebase/firestore';
+import { getFirestore, doc, setDoc } from 'firebase/firestore';
 
 
-import { isAuthenticated } from '$lib/stores';
+import { isAuthenticated, userId } from '$lib/stores';
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -36,8 +36,11 @@ export { auth };
 onAuthStateChanged(auth, (user) => {
 	if (user) {
 		isAuthenticated.set(true);
+		userId.set(user.uid);
+		user
 	} else {
 		isAuthenticated.set(false);
+		userId.set('');
 	}
 });
 
