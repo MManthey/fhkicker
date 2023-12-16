@@ -7,6 +7,7 @@ export const isAuthenticated = writable(false);
 export const email = localStorageStore('email', '');
 export const playerName = localStorageStore('playerName', '');
 export const userId = localStorageStore('userId', '');
+export const gameId = localStorageStore('gameId', '');
 
 isAuthenticated.subscribe((newValue) => {
 	if (browser) {

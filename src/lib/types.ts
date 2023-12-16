@@ -1,17 +1,20 @@
-type Player = {
+export type Player = {
 	id: string;
 	name: string;
 }
 
-type Game = {
-	id: string;
-	teamA: Player[];
-	teamB: Player[];
-};
-
-export type Games = {
-	playing: Game[];
-	waiting: Game[];
-	open: Game[];
-
+type Team = {
+	player1: Player | null;
+	player2: Player | null;
 }
+
+export type Game = {
+	status: 'open' | 'waiting' | 'playing';
+	position: number;
+	teamA: Team;
+	teamB: Team;
+	votes: {
+		teamA: Player[];
+		teamB: Player[];
+	};
+};

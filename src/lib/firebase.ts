@@ -8,10 +8,11 @@ import {
 	signInWithEmailAndPassword,
 	createUserWithEmailAndPassword
 } from 'firebase/auth';
-import { getFirestore, doc, setDoc } from 'firebase/firestore';
+import { getFirestore, doc, setDoc, updateDoc } from 'firebase/firestore';
 
 
 import { isAuthenticated, userId } from '$lib/stores';
+import type { Game } from './types';
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -29,7 +30,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app);
+export const db = getFirestore(app);
 
 export { auth };
 
@@ -37,7 +38,6 @@ onAuthStateChanged(auth, (user) => {
 	if (user) {
 		isAuthenticated.set(true);
 		userId.set(user.uid);
-		user
 	} else {
 		isAuthenticated.set(false);
 		userId.set('');
@@ -84,4 +84,15 @@ export async function createUserRecord(uid: string, email: string, playerName: s
 		// Handle errors
 
 	}
+}
+
+export async function updateGame(gameId: string, game: Game) {
+	const gameRef = doc(db, 'games', gameId);
+	try {
+        await updateDoc(gameRef, game);
+        console.log('Game updated successfully');
+    } catch (error) {
+        console.error('Error updating game:', error);
+    }
+
 }
