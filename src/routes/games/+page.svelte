@@ -2,16 +2,18 @@
 	import { onMount } from 'svelte';
 	import { onSnapshot, collection } from 'firebase/firestore';
 	import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
+	import { getToastStore } from '@skeletonlabs/skeleton';
+	import type { ToastSettings, ToastStore } from '@skeletonlabs/skeleton';
 
 	import { playerName, userId, gameId } from '$lib/stores';
 	import { db, updateGame } from '$lib/firebase';
 	import type { Player, Game } from '$lib/types';
 
+	const toastStore = getToastStore();
 	const tables = 1;
+	const sortByPosition = (a: [string, Game], b: [string, Game]) => a[1].position - b[1].position;
 
 	let games: Map<string, Game> = new Map();
-
-	const sortByPosition = (a: [string, Game], b: [string, Game]) => a[1].position - b[1].position;
 
 	// Reactive assignments
 	$: open = new Map(
@@ -33,6 +35,20 @@
 	);
 
 	$: currGame = games.get($gameId);
+	$: voteOver = (currGame?.votes.teamA.length || 0) + (currGame?.votes.teamB.length || 0) >= 4;
+	$: if (voteOver) {
+		const message =
+			(currGame?.votes.teamA || 0) > (currGame?.votes.teamB || 0)
+				? 'Team A gewinnt!'
+				: (currGame?.votes.teamA || 0) < (currGame?.votes.teamB || 0)
+				  ? 'Team B gewinnt!'
+				  : 'Es konnte kein Gewinner ermittelt werden!';
+		const t: ToastSettings = {
+			message
+		};
+		toastStore.trigger(t);
+		// adjust players score
+	}
 
 	// $: console.log(games);
 
@@ -112,11 +128,13 @@
 
 		const player: Player = { id: $userId, name: $playerName };
 		if (teamIndex) {
-			game.votes.teamB.push(player);
 			game.votes.teamA = game?.votes.teamA.filter((p) => p.id !== $userId);
-		} else {
-			game.votes.teamA.push(player);
 			game.votes.teamB = game?.votes.teamB.filter((p) => p.id !== $userId);
+			game.votes.teamB.push(player);
+		} else {
+			game.votes.teamA = game?.votes.teamA.filter((p) => p.id !== $userId);
+			game.votes.teamB = game?.votes.teamB.filter((p) => p.id !== $userId);
+			game.votes.teamA.push(player);
 		}
 		await updateGame($gameId, game);
 	}
@@ -144,16 +162,36 @@
 	});
 </script>
 
-<div class="max-w-xs h-full m-auto">
-	{#if currGame?.status === 'playing'}
-		<div class="text-4xl m-5">Wer hat gewonnen?</div>
-		<div class="h-full flex flex-col justify-center items-center">
+<div class="max-w-sm h-full m-auto">
+	<div class="flex flex-col items-center mt-10 gap-10">
+		{#if currGame?.status === 'playing'}
+			<div class="w-full card grid grid-cols-3 p-5 variant-ghost-success">
+				<div class="grid grid-rows-2 gap-2">
+					<div class="flex justify-center items-center min-h-[50px]">
+						{currGame?.teamA.player1?.name}
+					</div>
+					<div class="flex justify-center items-center min-h-[50px]">
+						{currGame?.teamA.player2?.name}
+					</div>
+				</div>
+				<div class="flex justify-center items-center">VS.</div>
+				<div class="grid grid-rows-2 gap-2">
+					<div class="flex justify-center items-center min-h-[50px]">
+						{currGame?.teamB.player1?.name}
+					</div>
+					<div class="flex justify-center items-center min-h-[50px]">
+						{currGame?.teamB.player2?.name}
+					</div>
+				</div>
+			</div>
+			<div class="text-4xl text-center m-5">Wer hat gewonnen?</div>
 			<div class="w-full grid grid-cols-2 gap-5">
-				{#each [currGame.votes.teamA, currGame.votes.teamB] as team, teamIndex}
+				{#each [currGame?.votes.teamA, currGame?.votes.teamB] as team, teamIndex}
 					<button
 						class="btn variant-ghost-{teamIndex
 							? 'error'
 							: 'success'} b-5 grid grid-rows-4 rounded-xl"
+						disabled={voteOver}
 						on:click={() => vote(teamIndex)}
 					>
 						<div class="text-2xl text-center">{teamIndex ? 'Team B' : 'Team A'}</div>
@@ -163,9 +201,7 @@
 					</button>
 				{/each}
 			</div>
-		</div>
-	{:else}
-		<div class="flex flex-col items-center">
+		{:else}
 			<div class="text-4xl m-5">Spiele</div>
 			<Accordion>
 				<AccordionItem open>
@@ -260,6 +296,6 @@
 			<button class="btn variant-filled-error mt-10" on:click={async () => leaveGame()}>
 				Leave Game
 			</button>
-		</div>
-	{/if}
+		{/if}
+	</div>
 </div>

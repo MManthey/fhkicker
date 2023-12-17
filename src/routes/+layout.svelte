@@ -1,6 +1,8 @@
 <script lang="ts">
 	import '../app.postcss';
 	import { AppShell, AppBar } from '@skeletonlabs/skeleton';
+	import { Toast } from '@skeletonlabs/skeleton';
+	import { initializeStores } from '@skeletonlabs/skeleton';
 
 	// Floating UI for Popups
 	import { computePosition, autoUpdate, flip, shift, offset, arrow } from '@floating-ui/dom';
@@ -8,6 +10,8 @@
 
 	import { isAuthenticated } from '$lib/stores';
 	import { logOut } from '$lib/firebase';
+
+	initializeStores();
 
 	storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
 </script>
@@ -31,4 +35,5 @@
 	</svelte:fragment>
 	<!-- Page Route Content -->
 	<slot />
+	<Toast />
 </AppShell>

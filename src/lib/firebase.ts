@@ -10,7 +10,6 @@ import {
 } from 'firebase/auth';
 import { getFirestore, doc, setDoc, updateDoc } from 'firebase/firestore';
 
-
 import { isAuthenticated, userId } from '$lib/stores';
 import type { Game } from './types';
 
