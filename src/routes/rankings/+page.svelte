@@ -57,7 +57,11 @@
 					<tr>
 						<td>{i + 1}.</td>
 						<td>{player.name}</td>
-						<td>{player.score.wins}:{player.score.losses} ({calculateWinRate(player).toFixed(2)}%)</td>
+						<td
+							>{player.score.wins}:{player.score.losses} ({calculateWinRate(player).toFixed(
+								2
+							)}%)</td
+						>
 					</tr>
 				{/each}
 			</tbody>

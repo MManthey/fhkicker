@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { onSnapshot, collection, type Unsubscribe } from 'firebase/firestore';
+	import { onSnapshot, collection } from 'firebase/firestore';
 	import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
 	import { getToastStore } from '@skeletonlabs/skeleton';
 	import type { ToastSettings } from '@skeletonlabs/skeleton';
@@ -140,11 +140,26 @@
 	}
 
 	onMount(() => {
+		let isInitialLoadComplete = false;
+
+		Notification.requestPermission().then((permission) => {
+			if (permission === 'granted') {
+				console.log('Notification permission granted.');
+			}
+		});
+
 		const unsubscribe = onSnapshot(collection(db, 'games'), (querySnapshot) => {
 			querySnapshot.docChanges().forEach(async (change) => {
-				let game = { ...change.doc.data() } as Game;
+				let game = change.doc.data() as Game;
 				switch (change.type) {
 					case 'added':
+						if (
+							isInitialLoadComplete &&
+							![...game.teams.a, ...game.teams.b].some((p) => p.id == $uid) &&
+							Notification.permission === 'granted'
+						) {
+							new Notification('New game added!');
+						}
 					case 'modified':
 						games = games.set(change.doc.id, game);
 						break;
@@ -154,6 +169,7 @@
 						break;
 				}
 			});
+			isInitialLoadComplete = true;
 		});
 
 		return () => {
