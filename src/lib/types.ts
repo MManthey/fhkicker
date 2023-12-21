@@ -1,20 +1,12 @@
 export type Player = {
-	id: string;
+	id: string
 	name: string;
-}
-
-type Team = {
-	player1: Player | null;
-	player2: Player | null;
+	score: { wins: number; losses: number }
 }
 
 export type Game = {
 	status: 'open' | 'waiting' | 'playing';
 	position: number;
-	teamA: Team;
-	teamB: Team;
-	votes: {
-		teamA: Player[];
-		teamB: Player[];
-	};
+	teams: { a: Player[], b: Player[] };
+	votes: { a: Player[], b: Player[] };
 };

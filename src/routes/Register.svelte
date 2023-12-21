@@ -2,7 +2,7 @@
 	import { ProgressRadial } from '@skeletonlabs/skeleton';
 
 	import { register } from '$lib/firebase';
-	import { email, playerName } from '$lib/stores';
+	import { email, name } from '$lib/stores';
 
 	const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 	const fhEmailRegex = /@fh-wedel\.de$/;
@@ -14,12 +14,13 @@
 
 	$: isEmail = emailRegex.test($email);
 	$: isFhEmail = fhEmailRegex.test($email);
-	$: buttonDisabled = buttonLoading || !isFhEmail || !$playerName || !password || password !== passwordConfirm;
+	$: buttonDisabled =
+		buttonLoading || !isFhEmail || !$name || !password || password !== passwordConfirm;
 
 	async function handleRegister() {
 		buttonLoading = true;
 		try {
-			await register($email, password, $playerName);
+			await register($email, password, $name);
 		} catch (error) {
 			console.error('logOut failed:', error);
 			// Handle errors
@@ -37,13 +38,7 @@
 		placeholder="FH-Wedel Mail angeben"
 		bind:value={$email}
 	/>
-	<input
-		class="input"
-		title="playerName"
-		type="text"
-		placeholder="Spielername"
-		bind:value={$playerName}
-	/>
+	<input class="input" title="name" type="text" placeholder="Name" bind:value={$name} />
 	<input
 		class="input"
 		title="password"
@@ -52,7 +47,7 @@
 		bind:value={password}
 	/>
 	<input
-		class="input {password ? (password === passwordConfirm ? 'input-success' : 'input-warning') : ''}"
+		class="input"
 		title="passwordConfirm"
 		type="password"
 		placeholder="Passwort bestätigen"

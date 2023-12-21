@@ -2,8 +2,8 @@
 import type { CustomThemeConfig } from '@skeletonlabs/tw-plugin';
 
 export const fhkicker_theme: CustomThemeConfig = {
-    name: 'fhkicker_theme',
-    properties: {
+	name: 'fhkicker_theme',
+	properties: {
 		// =~= Theme Properties =~=
 		"--theme-font-family-base": `system-ui`,
 		"--theme-font-family-heading": `system-ui`,
@@ -98,6 +98,6 @@ export const fhkicker_theme: CustomThemeConfig = {
 		"--color-surface-700": "26 82 80", // #1a5250
 		"--color-surface-800": "21 65 64", // #154140
 		"--color-surface-900": "17 53 52", // #113534
-		
+
 	}
 }

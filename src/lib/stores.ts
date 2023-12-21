@@ -5,8 +5,8 @@ import { localStorageStore } from '@skeletonlabs/skeleton';
 
 export const isAuthenticated = writable(false);
 export const email = localStorageStore('email', '');
-export const playerName = localStorageStore('playerName', '');
-export const userId = localStorageStore('userId', '');
+export const name = localStorageStore('name', '');
+export const uid = localStorageStore('uid', '');
 export const gameId = localStorageStore('gameId', '');
 
 isAuthenticated.subscribe((newValue) => {
@@ -22,14 +22,14 @@ email.subscribe((newValue) => {
 	}
 });
 
-playerName.subscribe((newValue) => {
+name.subscribe((newValue) => {
 	if (browser) {
-		console.log(`playerName: ${newValue}`);
+		console.log(`name: ${newValue}`);
 	}
 });
 
-userId.subscribe((newValue) => {
+uid.subscribe((newValue) => {
 	if (browser) {
-		console.log(`userId: ${newValue}`);
+		console.log(`uid: ${newValue}`);
 	}
 });
